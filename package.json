@@ -1,0 +1,13 @@
+{
+  "name": "financial-dashboard",
+  "version": "1.0.0",
+  "description": "Personal Finance Dashboard with Google Apps Script API",
+  "main": "index.html",
+  "scripts": {
+    "dev": "http-server",
+    "build": "echo 'No build needed for static site'"
+  },
+  "keywords": ["finance", "dashboard", "budget", "tracking"],
+  "author": "Your Name",
+  "license": "MIT"
+}
