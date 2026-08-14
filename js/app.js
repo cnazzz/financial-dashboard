@@ -648,22 +648,33 @@ function handleTypeChange() {
     categorySelect.innerHTML = '<option value="">Pilih Kategori</option>';
     subcategorySelect.innerHTML = '<option value="">Pilih Sub Kategori</option>';
 
+    // Filter kategori berdasarkan tipe yang dipilih
     const filteredCategories = appState.categories.filter(c => c.type === type);
-    filteredCategories.forEach(cat => {
+
+    // --- PERBAIKAN: Ambil nama kategori yang UNIK saja (menghilangkan duplikat) ---
+    const uniqueCategoryNames = [...new Set(filteredCategories.map(c => c.category))];
+
+    uniqueCategoryNames.forEach(categoryName => {
         const option = document.createElement('option');
-        option.value = cat.category; option.textContent = cat.category;
+        option.value = categoryName;
+        option.textContent = categoryName;
         categorySelect.appendChild(option);
     });
 
-    categorySelect.addEventListener('change', function() {
+    // Event saat kategori dipilih untuk memunculkan subkategori
+    categorySelect.onchange = function() {
         const selectedCat = this.value;
         subcategorySelect.innerHTML = '<option value="">Pilih Sub Kategori</option>';
-        filteredCategories.filter(c => c.category === selectedCat).forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat.subcategory; option.textContent = cat.subcategory;
-            subcategorySelect.appendChild(option);
-        });
-    });
+
+        filteredCategories
+            .filter(c => c.category === selectedCat && c.subcategory)
+            .forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.subcategory;
+                option.textContent = cat.subcategory;
+                subcategorySelect.appendChild(option);
+            });
+    };
 }
 
 function populateFormDropdowns() {
