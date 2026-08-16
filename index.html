@@ -9,12 +9,13 @@
 </head>
 <body>
     <div class="app">
-        <!-- SIDEBAR -->
+        <!-- SIDEBAR NAVIGATION -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h2>💰 FD</h2>
-                <button class="menu-toggle" id="menuToggle">☰</button>
+                <button class="menu-toggle" id="menuToggle">✕</button>
             </div>
+            
             <nav class="sidebar-nav">
                 <a href="#" class="nav-item active" data-section="dashboard">
                     <span class="icon">📊</span>
@@ -43,7 +44,7 @@
             </nav>
         </aside>
 
-        <!-- MAIN CONTENT -->
+        <!-- MAIN CONTENT AREA -->
         <main class="main-content">
             <!-- HEADER -->
             <header class="header">
@@ -74,8 +75,12 @@
                     </select>
                 </div>
                 <div class="filter-group" id="customDateRange" style="display: none;">
-                    <input type="date" id="dateFrom" placeholder="Dari">
-                    <input type="date" id="dateTo" placeholder="Hingga">
+                    <label>Dari</label>
+                    <input type="date" id="dateFrom">
+                </div>
+                <div class="filter-group" id="customDateRange2" style="display: none;">
+                    <label>Hingga</label>
+                    <input type="date" id="dateTo">
                 </div>
                 <div class="filter-group">
                     <label>Kategori</label>
@@ -100,185 +105,193 @@
                 </div>
             </div>
 
-            <!-- DASHBOARD SECTION -->
-            <section id="dashboard" class="section active">
-                <!-- KPI CARDS -->
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <h3>Total Pemasukan</h3>
-                            <span class="kpi-icon">📈</span>
+            <!-- CONTENT AREA - SCROLLABLE -->
+            <div class="content-area">
+                <!-- DASHBOARD SECTION -->
+                <section id="dashboard" class="section active">
+                    <!-- KPI CARDS -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <h3>Total Pemasukan</h3>
+                                <span class="kpi-icon">📈</span>
+                            </div>
+                            <div class="kpi-value" id="totalIncomeValue">Rp 0</div>
+                            <div class="kpi-footer">
+                                <span id="totalIncomeChange">↑ 0%</span>
+                            </div>
                         </div>
-                        <div class="kpi-value" id="totalIncomeValue">Rp 0</div>
-                        <div class="kpi-footer">
-                            <span id="totalIncomeChange">↑ 0%</span>
+
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <h3>Total Pengeluaran</h3>
+                                <span class="kpi-icon">📉</span>
+                            </div>
+                            <div class="kpi-value" id="totalExpenseValue">Rp 0</div>
+                            <div class="kpi-footer">
+                                <span id="totalExpenseChange">↑ 0%</span>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <h3>Net Cashflow</h3>
+                                <span class="kpi-icon">💰</span>
+                            </div>
+                            <div class="kpi-value" id="netCashflowValue">Rp 0</div>
+                            <div class="kpi-footer">
+                                <span id="netCashflowTrend">Positif</span>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <h3>Total Transaksi</h3>
+                                <span class="kpi-icon">📊</span>
+                            </div>
+                            <div class="kpi-value" id="transactionCountValue">0</div>
+                            <div class="kpi-footer">
+                                <span id="transactionCountChange">Transaksi</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <h3>Total Pengeluaran</h3>
-                            <span class="kpi-icon">📉</span>
+                    <!-- FINANCIAL INSIGHTS -->
+                    <div class="insights-section">
+                        <h2>💡 Insight Keuangan</h2>
+                        <div class="insights-list" id="insightsList"></div>
+                    </div>
+
+                    <!-- CHARTS SECTION -->
+                    <div class="charts-section">
+                        <h2>📊 Visualisasi Data</h2>
+                        <div class="charts-grid">
+                            <div class="chart-container">
+                                <h3>Cashflow Harian</h3>
+                                <canvas id="cashflowChart"></canvas>
+                            </div>
+
+                            <div class="chart-container">
+                                <h3>Pengeluaran per Kategori</h3>
+                                <canvas id="expenseChart"></canvas>
+                            </div>
+
+                            <div class="chart-container">
+                                <h3>Pemasukan per Kategori</h3>
+                                <canvas id="incomeChart"></canvas>
+                            </div>
+
+                            <div class="chart-container">
+                                <h3>Saldo Akun</h3>
+                                <canvas id="accountChart"></canvas>
+                            </div>
                         </div>
-                        <div class="kpi-value" id="totalExpenseValue">Rp 0</div>
-                        <div class="kpi-footer">
-                            <span id="totalExpenseChange">↑ 0%</span>
+                    </div>
+
+                    <!-- ACCOUNT BALANCES -->
+                    <div class="account-balances-section">
+                        <h2>💳 Saldo Akun</h2>
+                        <div class="account-balance-grid" id="accountBalanceGrid"></div>
+                    </div>
+                </section>
+
+                <!-- TRANSACTIONS SECTION -->
+                <section id="transactions" class="section">
+                    <div class="section-header">
+                        <h2>Daftar Transaksi</h2>
+                        <button class="btn btn-primary" id="addTransactionBtn">+ Tambah Transaksi</button>
+                    </div>
+
+                    <div class="transaction-table-container">
+                        <table class="transaction-table">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Tipe</th>
+                                    <th>Kategori</th>
+                                    <th>Deskripsi</th>
+                                    <th>Jumlah</th>
+                                    <th>Metode Bayar</th>
+                                    <th>Akun</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination">
+                        <button id="prevPage">← Sebelumnya</button>
+                        <span id="pageInfo">1</span>
+                        <button id="nextPage">Berikutnya →</button>
+                    </div>
+                </section>
+
+                <!-- ANALYSIS SECTION -->
+                <section id="analysis" class="section">
+                    <h2>📊 Analisis Mendalam</h2>
+                    <div class="analysis-grid">
+                        <div class="analysis-card">
+                            <h3>Pengeluaran Terbesar</h3>
+                            <div id="topExpenses" class="analysis-list"></div>
+                        </div>
+                        <div class="analysis-card">
+                            <h3>Pemasukan Terbesar</h3>
+                            <div id="topIncomes" class="analysis-list"></div>
                         </div>
                     </div>
+                </section>
 
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <h3>Net Cashflow</h3>
-                            <span class="kpi-icon">💰</span>
+                <!-- BUDGET SECTION -->
+                <section id="budget" class="section">
+                    <h2>🎯 Tracking Budget</h2>
+                    <div class="budget-grid" id="budgetGrid"></div>
+                </section>
+
+                <!-- ACCOUNTS SECTION -->
+                <section id="accounts" class="section">
+                    <h2>🏦 Daftar Akun</h2>
+                    <div class="accounts-grid" id="accountsGrid"></div>
+                </section>
+
+                <!-- SETTINGS SECTION -->
+                <section id="settings" class="section">
+                    <h2>⚙️ Pengaturan</h2>
+                    <div class="settings-form">
+                        <div class="setting-item">
+                            <label>Mata Uang</label>
+                            <select id="currencySetting">
+                                <option value="IDR">IDR (Rp)</option>
+                            </select>
                         </div>
-                        <div class="kpi-value" id="netCashflowValue">Rp 0</div>
-                        <div class="kpi-footer">
-                            <span id="netCashflowTrend">Positif</span>
+                        <div class="setting-item">
+                            <label>Tema</label>
+                            <select id="themeSetting">
+                                <option value="light">Terang</option>
+                                <option value="dark" selected>Gelap</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>Auto Refresh (detik)</label>
+                            <input type="number" id="autoRefreshSetting" value="30" min="10" max="300">
                         </div>
                     </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <h3>Total Transaksi</h3>
-                            <span class="kpi-icon">📊</span>
-                        </div>
-                        <div class="kpi-value" id="transactionCountValue">0</div>
-                        <div class="kpi-footer">
-                            <span id="transactionCountChange">Transaksi</span>
-                        </div>
+                    <button class="btn btn-primary" id="savSettingsBtn" style="margin-top: 1rem;">Simpan Pengaturan</button>
+                    
+                    <div class="setting-item" style="margin-top: 2rem;">
+                        <label>Google Apps Script API URL</label>
+                        <input type="text" id="apiUrlSetting" placeholder="https://script.google.com/macros/d/YOUR_SCRIPT_ID/exec" style="width: 100%; padding: 1rem;">
+                        <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">
+                            Format: https://script.google.com/macros/d/YOUR_SCRIPT_ID/exec
+                        </small>
                     </div>
-                </div>
-
-                <!-- FINANCIAL INSIGHTS -->
-                <div class="insights-section">
-                    <h2>💡 Insight Keuangan</h2>
-                    <div class="insights-list" id="insightsList"></div>
-                </div>
-
-                <!-- CHARTS SECTION -->
-                <div class="charts-section">
-                    <div class="chart-container">
-                        <h3>Cashflow Harian</h3>
-                        <canvas id="cashflowChart"></canvas>
-                    </div>
-
-                    <div class="chart-container">
-                        <h3>Pengeluaran per Kategori</h3>
-                        <canvas id="expenseChart"></canvas>
-                    </div>
-
-                    <div class="chart-container">
-                        <h3>Pemasukan per Kategori</h3>
-                        <canvas id="incomeChart"></canvas>
-                    </div>
-
-                    <div class="chart-container">
-                        <h3>Saldo Akun</h3>
-                        <canvas id="accountChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- ACCOUNT BALANCES -->
-                <div class="account-balances-section">
-                    <h2>Saldo Akun</h2>
-                    <div class="account-balance-grid" id="accountBalanceGrid"></div>
-                </div>
-            </section>
-
-            <!-- TRANSACTIONS SECTION -->
-            <section id="transactions" class="section">
-                <div class="section-header">
-                    <h2>Daftar Transaksi</h2>
-                    <button class="btn btn-primary" id="addTransactionBtn">+ Tambah Transaksi</button>
-                </div>
-
-                <div class="transaction-table-container">
-                    <table class="transaction-table">
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Tipe</th>
-                                <th>Kategori</th>
-                                <th>Deskripsi</th>
-                                <th>Jumlah</th>
-                                <th>Metode Bayar</th>
-                                <th>Akun</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transactionTableBody">
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="pagination">
-                    <button id="prevPage">← Sebelumnya</button>
-                    <span id="pageInfo">1</span>
-                    <button id="nextPage">Berikutnya →</button>
-                </div>
-            </section>
-
-            <!-- ANALYSIS SECTION -->
-            <section id="analysis" class="section">
-                <div class="analysis-grid">
-                    <div class="analysis-card">
-                        <h3>Pengeluaran Terbesar</h3>
-                        <div id="topExpenses" class="analysis-list"></div>
-                    </div>
-                    <div class="analysis-card">
-                        <h3>Pemasukan Terbesar</h3>
-                        <div id="topIncomes" class="analysis-list"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- BUDGET SECTION -->
-            <section id="budget" class="section">
-                <h2>Tracking Budget</h2>
-                <div class="budget-grid" id="budgetGrid"></div>
-            </section>
-
-            <!-- ACCOUNTS SECTION -->
-            <section id="accounts" class="section">
-                <h2>Daftar Akun</h2>
-                <div class="accounts-grid" id="accountsGrid"></div>
-            </section>
-
-            <!-- SETTINGS SECTION -->
-            <section id="settings" class="section">
-                <h2>Pengaturan</h2>
-                <div class="settings-form">
-                    <div class="setting-item">
-                        <label>Mata Uang</label>
-                        <select id="currencySetting">
-                            <option value="IDR">IDR (Rp)</option>
-                        </select>
-                    </div>
-                    <div class="setting-item">
-                        <label>Tema</label>
-                        <select id="themeSetting">
-                            <option value="light">Terang</option>
-                            <option value="dark">Gelap</option>
-                        </select>
-                    </div>
-                    <div class="setting-item">
-                        <label>Auto Refresh (detik)</label>
-                        <input type="number" id="autoRefreshSetting" value="30" min="10" max="300">
-                    </div>
-                    <button class="btn btn-primary" id="savSettingsBtn">Simpan Pengaturan</button>
-                </div>
-                <div class="setting-item" style="margin-top: 20px;">
-                    <label>Google Apps Script API URL</label>
-                    <input type="text" id="apiUrlSetting" placeholder="Paste deployment URL Apps Script di sini" style="width: 100%; padding: 10px;">
-                    <small style="color: var(--text-secondary); display: block; margin-top: 5px;">
-                        Format: https://script.google.com/macros/d/YOUR_SCRIPT_ID/exec
-                    </small>
-                </div>
-            </section>
+                </section>
+            </div>
         </main>
     </div>
 
-    <!-- MODAL ADD/EDIT TRANSACTION -->
+    <!-- MODAL - ADD/EDIT TRANSACTION -->
     <div class="modal" id="transactionModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -358,7 +371,7 @@
         </div>
     </div>
 
-    <!-- NOTIFICATION -->
+    <!-- NOTIFICATION TOAST -->
     <div class="toast" id="toast">
         <span id="toastMessage"></span>
     </div>
