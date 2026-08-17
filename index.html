@@ -1,389 +1,408 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Dashboard</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css" rel="stylesheet">
+    <title>Financial Dashboard 💰</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div id="loadingText">Memuat data...</div>
+    </div>
+
     <div class="app">
-        <!-- SIDEBAR NAVIGATION -->
-        <aside class="sidebar" id="sidebar">
+        <!-- SIDEBAR -->
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2>💰 FD</h2>
+                <h2>💼 FinDash</h2>
                 <button class="menu-toggle" id="menuToggle">✕</button>
             </div>
-            
+
             <nav class="sidebar-nav">
                 <a href="#" class="nav-item active" data-section="dashboard">
                     <span class="icon">📊</span>
                     <span class="label">Dashboard</span>
                 </a>
                 <a href="#" class="nav-item" data-section="transactions">
-                    <span class="icon">💳</span>
-                    <span class="label">Transaksi</span>
-                </a>
-                <a href="#" class="nav-item" data-section="analysis">
-                    <span class="icon">📈</span>
-                    <span class="label">Analisis</span>
+                    <span class="icon">💸</span>
+                    <span class="label">Transactions</span>
                 </a>
                 <a href="#" class="nav-item" data-section="budget">
                     <span class="icon">🎯</span>
                     <span class="label">Budget</span>
                 </a>
+                <a href="#" class="nav-item" data-section="analysis">
+                    <span class="icon">📈</span>
+                    <span class="label">Analysis</span>
+                </a>
                 <a href="#" class="nav-item" data-section="accounts">
                     <span class="icon">🏦</span>
-                    <span class="label">Akun</span>
+                    <span class="label">Accounts</span>
                 </a>
                 <a href="#" class="nav-item" data-section="settings">
                     <span class="icon">⚙️</span>
-                    <span class="label">Pengaturan</span>
+                    <span class="label">Settings</span>
                 </a>
             </nav>
-        </aside>
+        </div>
 
-        <!-- MAIN CONTENT AREA -->
-        <main class="main-content">
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
             <!-- HEADER -->
-            <header class="header">
+            <div class="header">
                 <div class="header-left">
                     <h1>Financial Dashboard</h1>
                 </div>
                 <div class="header-right">
                     <div class="status-indicator">
-                        <span class="status-dot" id="statusDot"></span>
-                        <span id="statusText">Offline</span>
+                        <span class="status-dot live"></span>
+                        <span>Live Data</span>
                     </div>
-                    <button class="btn-icon" id="refreshBtn" title="Refresh data">🔄</button>
+                    <button class="btn-icon" id="menuToggleMobile" style="display: none;">☰</button>
                 </div>
-            </header>
+            </div>
 
             <!-- FILTERS -->
             <div class="filters-section">
                 <div class="filter-group">
-                    <label>Periode</label>
-                    <select id="dateRangeFilter">
-                        <option value="today">Hari Ini</option>
-                        <option value="yesterday">Kemarin</option>
-                        <option value="thisweek">Minggu Ini</option>
-                        <option value="thismonth" selected>Bulan Ini</option>
-                        <option value="lastmonth">Bulan Lalu</option>
-                        <option value="thisyear">Tahun Ini</option>
-                        <option value="custom">Kustom</option>
-                    </select>
-                </div>
-                <div class="filter-group" id="customDateRange" style="display: none;">
-                    <label>Dari</label>
-                    <input type="date" id="dateFrom">
-                </div>
-                <div class="filter-group" id="customDateRange2" style="display: none;">
-                    <label>Hingga</label>
-                    <input type="date" id="dateTo">
+                    <label for="monthFilter">Month:</label>
+                    <input type="month" id="monthFilter">
                 </div>
                 <div class="filter-group">
-                    <label>Kategori</label>
+                    <label for="categoryFilter">Category:</label>
                     <select id="categoryFilter">
-                        <option value="">Semua Kategori</option>
+                        <option value="">All Categories</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Akun</label>
-                    <select id="accountFilter">
-                        <option value="">Semua Akun</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Tipe</label>
+                    <label for="typeFilter">Type:</label>
                     <select id="typeFilter">
-                        <option value="">Semua Tipe</option>
-                        <option value="Income">Pemasukan</option>
-                        <option value="Expense">Pengeluaran</option>
+                        <option value="">All Types</option>
+                        <option value="Income">Income</option>
+                        <option value="Expense">Expense</option>
                         <option value="Transfer">Transfer</option>
                     </select>
                 </div>
             </div>
 
-            <!-- CONTENT AREA - SCROLLABLE -->
+            <!-- CONTENT AREA -->
             <div class="content-area">
                 <!-- DASHBOARD SECTION -->
-                <section id="dashboard" class="section active">
+                <section class="section active" id="dashboard-section">
                     <!-- KPI CARDS -->
-                    <div class="kpi-grid">
-                        <div class="kpi-card">
-                            <div class="kpi-header">
-                                <h3>Total Pemasukan</h3>
-                                <span class="kpi-icon">📈</span>
-                            </div>
-                            <div class="kpi-value" id="totalIncomeValue">Rp 0</div>
-                            <div class="kpi-footer">
-                                <span id="totalIncomeChange">↑ 0%</span>
-                            </div>
-                        </div>
-
-                        <div class="kpi-card">
-                            <div class="kpi-header">
-                                <h3>Total Pengeluaran</h3>
-                                <span class="kpi-icon">📉</span>
-                            </div>
-                            <div class="kpi-value" id="totalExpenseValue">Rp 0</div>
-                            <div class="kpi-footer">
-                                <span id="totalExpenseChange">↑ 0%</span>
-                            </div>
-                        </div>
-
-                        <div class="kpi-card">
-                            <div class="kpi-header">
-                                <h3>Net Cashflow</h3>
-                                <span class="kpi-icon">💰</span>
-                            </div>
-                            <div class="kpi-value" id="netCashflowValue">Rp 0</div>
-                            <div class="kpi-footer">
-                                <span id="netCashflowTrend">Positif</span>
-                            </div>
-                        </div>
-
-                        <div class="kpi-card">
-                            <div class="kpi-header">
-                                <h3>Total Transaksi</h3>
-                                <span class="kpi-icon">📊</span>
-                            </div>
-                            <div class="kpi-value" id="transactionCountValue">0</div>
-                            <div class="kpi-footer">
-                                <span id="transactionCountChange">Transaksi</span>
-                            </div>
-                        </div>
+                    <div class="kpi-grid" id="kpiGrid">
+                        <!-- Populated by JS -->
                     </div>
 
-                    <!-- FINANCIAL INSIGHTS -->
+                    <!-- INSIGHTS -->
                     <div class="insights-section">
-                        <h2>💡 Insight Keuangan</h2>
-                        <div class="insights-list" id="insightsList"></div>
-                    </div>
-
-                    <!-- CHARTS SECTION -->
-                    <div class="charts-section">
-                        <h2>📊 Visualisasi Data</h2>
-                        <div class="charts-grid">
-                            <div class="chart-container">
-                                <h3>Cashflow Harian</h3>
-                                <canvas id="cashflowChart"></canvas>
-                            </div>
-
-                            <div class="chart-container">
-                                <h3>Pengeluaran per Kategori</h3>
-                                <canvas id="expenseChart"></canvas>
-                            </div>
-
-                            <div class="chart-container">
-                                <h3>Pemasukan per Kategori</h3>
-                                <canvas id="incomeChart"></canvas>
-                            </div>
-
-                            <div class="chart-container">
-                                <h3>Saldo Akun</h3>
-                                <canvas id="accountChart"></canvas>
-                            </div>
+                        <h2>💡 Quick Insights</h2>
+                        <div class="insights-list" id="insightsList">
+                            <!-- Populated by JS -->
                         </div>
                     </div>
 
                     <!-- ACCOUNT BALANCES -->
                     <div class="account-balances-section">
-                        <h2>💳 Saldo Akun</h2>
-                        <div class="account-balance-grid" id="accountBalanceGrid"></div>
+                        <h2>🏦 Account Balances</h2>
+                        <div class="account-balance-grid" id="accountBalances">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- CHARTS -->
+                    <div class="charts-section">
+                        <h2>📊 Analytics</h2>
+                        <div class="charts-grid">
+                            <div class="chart-container">
+                                <h3>Expense by Category</h3>
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                            <div class="chart-container">
+                                <h3>Income vs Expense Trend</h3>
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
                 <!-- TRANSACTIONS SECTION -->
-                <section id="transactions" class="section">
+                <section class="section" id="transactions-section">
                     <div class="section-header">
-                        <h2>Daftar Transaksi</h2>
-                        <button class="btn btn-primary" id="addTransactionBtn">+ Tambah Transaksi</button>
+                        <h2>Transactions</h2>
+                        <button class="btn btn-primary" id="addTransactionBtn">
+                            ➕ Add Transaction
+                        </button>
                     </div>
 
                     <div class="transaction-table-container">
                         <table class="transaction-table">
                             <thead>
                                 <tr>
-                                    <th>Tanggal</th>
-                                    <th>Tipe</th>
-                                    <th>Kategori</th>
-                                    <th>Deskripsi</th>
-                                    <th>Jumlah</th>
-                                    <th>Metode Bayar</th>
-                                    <th>Akun</th>
-                                    <th>Aksi</th>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Account</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="transactionTableBody">
+                            <tbody id="transactionTable">
+                                <!-- Populated by JS -->
                             </tbody>
                         </table>
                     </div>
 
-                    <div class="pagination">
-                        <button id="prevPage">← Sebelumnya</button>
-                        <span id="pageInfo">1</span>
-                        <button id="nextPage">Berikutnya →</button>
-                    </div>
-                </section>
-
-                <!-- ANALYSIS SECTION -->
-                <section id="analysis" class="section">
-                    <h2>📊 Analisis Mendalam</h2>
-                    <div class="analysis-grid">
-                        <div class="analysis-card">
-                            <h3>Pengeluaran Terbesar</h3>
-                            <div id="topExpenses" class="analysis-list"></div>
-                        </div>
-                        <div class="analysis-card">
-                            <h3>Pemasukan Terbesar</h3>
-                            <div id="topIncomes" class="analysis-list"></div>
-                        </div>
+                    <div class="pagination" id="pagination">
+                        <button id="prevBtn">← Previous</button>
+                        <span id="pageInfo">Page 1</span>
+                        <button id="nextBtn">Next →</button>
                     </div>
                 </section>
 
                 <!-- BUDGET SECTION -->
-                <section id="budget" class="section">
-                    <h2>🎯 Tracking Budget</h2>
-                    <div class="budget-grid" id="budgetGrid"></div>
+                <section class="section" id="budget-section">
+                    <div class="section-header">
+                        <h2>Budget</h2>
+                        <button class="btn btn-primary" id="addBudgetBtn">
+                            ➕ Add Budget
+                        </button>
+                    </div>
+
+                    <div class="budget-grid" id="budgetGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+
+                <!-- ANALYSIS SECTION -->
+                <section class="section" id="analysis-section">
+                    <div class="section-header">
+                        <h2>Analysis</h2>
+                    </div>
+
+                    <div class="analysis-grid">
+                        <div class="analysis-card">
+                            <h3>💰 Top Expenses</h3>
+                            <div class="analysis-list" id="topExpensesList">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                        <div class="analysis-card">
+                            <h3>💵 Top Income</h3>
+                            <div class="analysis-list" id="topIncomeList">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                        <div class="analysis-card">
+                            <h3>🎯 Savings</h3>
+                            <div class="analysis-list" id="savingsList">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- ACCOUNTS SECTION -->
-                <section id="accounts" class="section">
-                    <h2>🏦 Daftar Akun</h2>
-                    <div class="accounts-grid" id="accountsGrid"></div>
+                <section class="section" id="accounts-section">
+                    <div class="section-header">
+                        <h2>Accounts</h2>
+                        <button class="btn btn-primary" id="addAccountBtn">
+                            ➕ Add Account
+                        </button>
+                    </div>
+
+                    <div class="accounts-grid" id="accountsGrid">
+                        <!-- Populated by JS -->
+                    </div>
                 </section>
 
                 <!-- SETTINGS SECTION -->
-                <section id="settings" class="section">
-                    <h2>⚙️ Pengaturan</h2>
-                    <div class="settings-form">
+                <section class="section" id="settings-section">
+                    <div class="section-header">
+                        <h2>⚙️ Settings</h2>
+                    </div>
+
+                    <div class="settings-form" id="settingsForm">
                         <div class="setting-item">
-                            <label>Mata Uang</label>
-                            <select id="currencySetting">
-                                <option value="IDR">IDR (Rp)</option>
+                            <label for="currencySelect">Currency</label>
+                            <select id="currencySelect">
+                                <option value="IDR">IDR (Indonesian Rupiah)</option>
+                                <option value="USD">USD (US Dollar)</option>
+                                <option value="EUR">EUR (Euro)</option>
+                                <option value="SGD">SGD (Singapore Dollar)</option>
                             </select>
                         </div>
+
                         <div class="setting-item">
-                            <label>Tema</label>
-                            <select id="themeSetting">
-                                <option value="light">Terang</option>
-                                <option value="dark" selected>Gelap</option>
+                            <label for="apiUrlInput">API URL</label>
+                            <input type="text" id="apiUrlInput" placeholder="https://script.google.com/macros/d/...">
+                            <small>Get your Google Apps Script API URL</small>
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="dateFormatSelect">Date Format</label>
+                            <select id="dateFormatSelect">
+                                <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
                             </select>
                         </div>
+
                         <div class="setting-item">
-                            <label>Auto Refresh (detik)</label>
-                            <input type="number" id="autoRefreshSetting" value="30" min="10" max="300">
+                            <label for="dataRefresh">Auto Refresh (seconds)</label>
+                            <input type="number" id="dataRefresh" value="300" min="60" step="60">
+                            <small>Minimum: 60 seconds</small>
                         </div>
                     </div>
-                    <button class="btn btn-primary" id="savSettingsBtn" style="margin-top: 1rem;">Simpan Pengaturan</button>
-                    
-                    <div class="setting-item" style="margin-top: 2rem;">
-                        <label>Google Apps Script API URL</label>
-                        <input type="text" id="apiUrlSetting" placeholder="https://script.google.com/macros/d/YOUR_SCRIPT_ID/exec" style="width: 100%; padding: 1rem;">
-                        <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">
-                            Format: https://script.google.com/macros/d/YOUR_SCRIPT_ID/exec
-                        </small>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-primary" id="saveSettingsBtn">💾 Save Settings</button>
+                        <button class="btn btn-secondary" id="exportDataBtn">📥 Export Data</button>
                     </div>
                 </section>
             </div>
-        </main>
+        </div>
     </div>
 
-    <!-- MODAL - ADD/EDIT TRANSACTION -->
+    <!-- TRANSACTION MODAL -->
     <div class="modal" id="transactionModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">Tambah Transaksi</h2>
-                <button class="modal-close" id="closeModalBtn">✕</button>
+                <h2 id="transactionModalTitle">Add Transaction</h2>
+                <button class="modal-close" id="closeTransactionModal">✕</button>
             </div>
             <form id="transactionForm">
                 <div class="form-group">
-                    <label>Tanggal *</label>
-                    <input type="date" id="formDate" required>
+                    <label for="txDate">Date</label>
+                    <input type="date" id="txDate" required>
                 </div>
-
                 <div class="form-group">
-                    <label>Tipe Transaksi *</label>
-                    <select id="formType" required>
-                        <option value="">Pilih Tipe</option>
-                        <option value="Income">Pemasukan</option>
-                        <option value="Expense">Pengeluaran</option>
+                    <label for="txType">Type</label>
+                    <select id="txType" required>
+                        <option value="">Select Type</option>
+                        <option value="Income">Income</option>
+                        <option value="Expense">Expense</option>
                         <option value="Transfer">Transfer</option>
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <label>Kategori *</label>
-                    <select id="formCategory" required>
-                        <option value="">Pilih Kategori</option>
+                    <label for="txCategory">Category</label>
+                    <select id="txCategory" required>
+                        <option value="">Select Category</option>
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <label>Sub Kategori</label>
-                    <select id="formSubcategory">
-                        <option value="">Pilih Sub Kategori</option>
+                    <label for="txSubcategory">Subcategory</label>
+                    <select id="txSubcategory">
+                        <option value="">Select Subcategory</option>
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <label>Deskripsi</label>
-                    <input type="text" id="formDescription" placeholder="Deskripsi transaksi">
+                    <label for="txDescription">Description</label>
+                    <input type="text" id="txDescription" required>
                 </div>
-
                 <div class="form-group">
-                    <label>Jumlah *</label>
-                    <input type="number" id="formAmount" placeholder="0" min="0" step="100" required>
+                    <label for="txAmount">Amount</label>
+                    <input type="number" id="txAmount" step="0.01" required>
                 </div>
-
                 <div class="form-group">
-                    <label>Metode Pembayaran *</label>
-                    <select id="formPaymentMethod" required>
-                        <option value="">Pilih Metode</option>
-                        <option value="Cash">Tunai</option>
-                        <option value="Bank Transfer">Transfer Bank</option>
-                        <option value="Debit Card">Kartu Debit</option>
-                        <option value="Credit Card">Kartu Kredit</option>
-                        <option value="E-Wallet">E-Wallet</option>
-                        <option value="QRIS">QRIS</option>
+                    <label for="txPayment">Payment Method</label>
+                    <select id="txPayment" required>
+                        <option value="">Select Payment Method</option>
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <label>Akun *</label>
-                    <select id="formAccount" required>
-                        <option value="">Pilih Akun</option>
+                    <label for="txAccount">Account</label>
+                    <select id="txAccount" required>
+                        <option value="">Select Account</option>
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <label>Catatan</label>
-                    <textarea id="formNotes" placeholder="Catatan tambahan" rows="3"></textarea>
+                    <label for="txNotes">Notes</label>
+                    <textarea id="txNotes"></textarea>
                 </div>
-
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Transaksi</button>
+                    <button type="button" class="btn btn-secondary" id="cancelTransactionBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Transaction</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- NOTIFICATION TOAST -->
-    <div class="toast" id="toast">
-        <span id="toastMessage"></span>
+    <!-- BUDGET MODAL -->
+    <div class="modal" id="budgetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Budget</h2>
+                <button class="modal-close" id="closeBudgetModal">✕</button>
+            </div>
+            <form id="budgetForm">
+                <div class="form-group">
+                    <label for="budgetMonth">Month</label>
+                    <input type="month" id="budgetMonth" required>
+                </div>
+                <div class="form-group">
+                    <label for="budgetCategory">Category</label>
+                    <select id="budgetCategory" required>
+                        <option value="">Select Category</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="budgetAmount">Budget Amount</label>
+                    <input type="number" id="budgetAmount" step="0.01" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBudgetBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Budget</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- LOADING OVERLAY -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-        <p id="loadingText">Memuat...</p>
+    <!-- ACCOUNT MODAL -->
+    <div class="modal" id="accountModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Account</h2>
+                <button class="modal-close" id="closeAccountModal">✕</button>
+            </div>
+            <form id="accountForm">
+                <div class="form-group">
+                    <label for="accountName">Account Name</label>
+                    <input type="text" id="accountName" required>
+                </div>
+                <div class="form-group">
+                    <label for="accountType">Account Type</label>
+                    <select id="accountType" required>
+                        <option value="">Select Type</option>
+                        <option value="Checking">Checking</option>
+                        <option value="Savings">Savings</option>
+                        <option value="Investment">Investment</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Credit Card">Credit Card</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="accountBalance">Initial Balance</label>
+                    <input type="number" id="accountBalance" step="0.01" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelAccountBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Account</button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast" id="toast"></div>
 
     <!-- SCRIPTS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
