@@ -146,7 +146,7 @@ async function loadDashboardData() {
         populateFilterDropdowns();
         populateTransactionDropdowns();
         renderDashboard();
-        renderTransactionsTable();
+        renderTransactionsTable(loadDashboardData);
         updateLiveStatus();
     } catch (error) {
         console.error('Dashboard load error:', error);
