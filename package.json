@@ -1,13 +1,18 @@
 {
   "name": "financial-dashboard",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Personal Finance Dashboard with Google Apps Script API",
-  "main": "index.html",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "http-server",
-    "build": "echo 'No build needed for static site'"
+    "dev": "http-server . -c-1",
+    "start": "http-server .",
+    "build": "node -e \"console.log('Static site: no build step required')\""
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
   },
   "keywords": ["finance", "dashboard", "budget", "tracking"],
-  "author": "Your Name",
+  "author": "cnazzz",
   "license": "MIT"
 }
