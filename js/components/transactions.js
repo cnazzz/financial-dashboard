@@ -1,7 +1,6 @@
 import { appState } from '../core/state.js';
 import { PAYMENT_METHODS } from '../core/config.js';
 import { saveTransaction, updateTransaction, deleteTransaction as deleteTransactionApi } from '../api/endpoints.js';
-import { calculateKPI } from '../calculations/finance.js';
 import { $, escapeHtml, openModal, closeModal, showLoading, hideLoading, showToast } from '../utils/dom.js';
 import { formatCurrency, formatDate, toInputDate } from '../utils/format.js';
 
@@ -119,6 +118,8 @@ export function openAddTransactionModal() {
     appState.editingTransactionId = null;
     if ($('transactionModalTitle')) $('transactionModalTitle').textContent = 'Add Transaction';
     $('transactionForm')?.reset();
+    const today = new Date();
+    if ($('txDate')) $('txDate').valueAsDate = today;
     openModal('transactionModal');
 }
 
