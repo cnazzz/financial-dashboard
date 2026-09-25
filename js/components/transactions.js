@@ -95,7 +95,7 @@ export function renderTransactionsTable() {
         const sign = t.type === 'Expense' ? '-' : '+';
         const cls = t.type === 'Expense' ? 'negative' : '';
         return '<tr><td>' + formatDate(t.date) + '</td><td>' + escapeHtml(t.description) +
-            '</td><td>' + escapeHtml(t.type) + '</td><td>' + escapeHtml(t.category) +
+            '</td><td><span class="type-badge type-' + String(t.type).toLowerCase() + '">' + escapeHtml(t.type) + '</span></td><td>' + escapeHtml(t.category) +
             '</td><td class="' + cls + '">' + sign + ' ' + formatCurrency(t.amount) +
             '</td><td>' + escapeHtml(t.account) + '</td><td><button class="btn btn-small" data-action="edit" data-id="' +
             escapeHtml(String(t.id)) + '">Edit</button> <button class="btn btn-small btn-danger" data-action="delete" data-id="' +
@@ -106,7 +106,7 @@ export function renderTransactionsTable() {
         b.addEventListener('click', () => editTransaction(b.dataset.id))
     );
     tbody.querySelectorAll('[data-action="delete"]').forEach(b =>
-        b.addEventListener('click', () => deleteTransaction(b.dataset.id))
+        b.addEventListener('click', () => deleteTransaction(b.dataset.id, window.__reloadDashboard))
     );
 
     if ($('pageInfo')) $('pageInfo').textContent = 'Page ' + appState.currentPage + ' / ' + totalPages;
@@ -147,7 +147,7 @@ export async function handleTransactionSubmit(e, reload) {
     if (!appState.apiUrl) return showToast('API URL belum dikonfigurasi', 'error');
 
     const amount = Number($('txAmount').value);
-    if (!$('txDate').value || !$('txType').value || !$('txCategory').value || !amount || !$('txAccount').value) {
+    if (!$('txDate').value || !$('txType').value || !$('txCategory').value || !amount || !$('txPayment').value || !$('txAccount').value) {
         return showToast('Harap isi field transaksi yang wajib', 'error');
     }
 
