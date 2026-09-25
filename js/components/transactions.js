@@ -83,7 +83,7 @@ export function populateSubcategories() {
     names.forEach(v => sub.add(new Option(v, v)));
 }
 
-export function renderTransactionsTable() {
+export function renderTransactionsTable(reload = null) {
     const tbody = $('transactionTable');
     if (!tbody) return;
     const totalPages = Math.max(1, Math.ceil(appState.transactions.length / appState.pageSize));
@@ -106,7 +106,7 @@ export function renderTransactionsTable() {
         b.addEventListener('click', () => editTransaction(b.dataset.id))
     );
     tbody.querySelectorAll('[data-action="delete"]').forEach(b =>
-        b.addEventListener('click', () => deleteTransaction(b.dataset.id, window.__reloadDashboard))
+        b.addEventListener('click', () => deleteTransaction(b.dataset.id, reload))
     );
 
     if ($('pageInfo')) $('pageInfo').textContent = 'Page ' + appState.currentPage + ' / ' + totalPages;
@@ -179,7 +179,7 @@ export async function handleTransactionSubmit(e, reload) {
     }
 }
 
-export async function deleteTransaction(id, reload) {
+export async function deleteTransaction(id, reload = async () => {}) {
     if (!confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) return;
     if (!appState.apiUrl) return showToast('API URL belum dikonfigurasi', 'error');
 
