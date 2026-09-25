@@ -1,3 +1,5 @@
+import { getDashboardData, saveTransaction, updateTransaction, deleteTransaction } from './api/endpoints.js';
+
 const DEFAULT_SETTINGS = {
     currency: 'IDR',
     dateFormat: 'DD/MM/YYYY',
@@ -141,15 +143,7 @@ async function loadDashboardData() {
 
     showLoading('Memuat data dashboard...');
     try {
-        const response = await fetch(appState.apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            redirect: 'follow',
-            body: JSON.stringify({ action: 'getDashboardData', filters: buildApiFilters() })
-        });
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        const data = await response.json();
-        if (data.error) throw new Error(data.error);
+        const data = await getDashboardData(appState.apiUrl, buildApiFilters());
 
         appState.transactions = normalizeTransactions(data.transactions || []);
         appState.accounts = data.accounts || [];
@@ -481,7 +475,9 @@ async function handleTransactionSubmit(e) {
     };
     showLoading('Menyimpan transaksi...');
     try {
-        const response = await postApi(payload);
+        const response = appState.editingTransactionId
+            ? await updateTransaction(appState.apiUrl, appState.editingTransactionId, payload.data)
+            : await saveTransaction(appState.apiUrl, payload.data);
         if (!response.success) throw new Error(response.error || response.message || 'Operasi gagal');
         showToast(response.message || 'Transaksi berhasil disimpan', 'success');
         closeModal('transactionModal');
@@ -498,7 +494,7 @@ async function deleteTransaction(id) {
     if (!appState.apiUrl) return showToast('API URL belum dikonfigurasi', 'error');
     showLoading('Menghapus transaksi...');
     try {
-        const result = await postApi({ action: 'deleteTransaction', id });
+        const result = await deleteTransaction(appState.apiUrl, id);
         if (!result.success) throw new Error(result.error || result.message || 'Operasi gagal');
         showToast(result.message || 'Transaksi dihapus', 'success');
         await loadDashboardData();
@@ -507,17 +503,6 @@ async function deleteTransaction(id) {
     } finally {
         hideLoading();
     }
-}
-
-async function postApi(payload) {
-    const response = await fetch(appState.apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        redirect: 'follow',
-        body: JSON.stringify(payload)
-    });
-    if (!response.ok) throw new Error('HTTP ' + response.status);
-    return response.json();
 }
 
 function applyFilters() {
