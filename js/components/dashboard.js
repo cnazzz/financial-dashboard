@@ -72,6 +72,12 @@ function renderCategoryChart() {
         data[t.category || 'Uncategorized'] = (data[t.category || 'Uncategorized'] || 0) + t.amount;
     });
 
+    if (!Object.keys(data).length) {
+        showChartEmptyState(canvas, 'Belum ada data pengeluaran untuk periode ini.');
+        return;
+    }
+
+    restoreChartCanvas(canvas);
     appState.charts.category = new Chart(canvas.getContext('2d'), {
         type: 'doughnut',
         data: { labels: Object.keys(data), datasets: [{ data: Object.values(data) }] },
@@ -92,6 +98,12 @@ function renderTrendChart() {
     });
 
     const labels = Object.keys(data).sort();
+    if (!labels.length) {
+        showChartEmptyState(canvas, 'Belum ada data cashflow untuk periode ini.');
+        return;
+    }
+
+    restoreChartCanvas(canvas);
     appState.charts.trend = new Chart(canvas.getContext('2d'), {
         type: 'line',
         data: {
@@ -103,6 +115,24 @@ function renderTrendChart() {
         },
         options: { responsive: true, maintainAspectRatio: false }
     });
+}
+
+function showChartEmptyState(canvas, message) {
+    const container = canvas.parentElement;
+    if (!container) return;
+    canvas.style.display = 'none';
+    let state = container.querySelector('.chart-empty-state');
+    if (!state) {
+        state = document.createElement('div');
+        state.className = 'chart-empty-state empty-state';
+        container.appendChild(state);
+    }
+    state.textContent = message;
+}
+
+function restoreChartCanvas(canvas) {
+    canvas.style.display = '';
+    canvas.parentElement?.querySelector('.chart-empty-state')?.remove();
 }
 
 function renderBudgetSection() {
