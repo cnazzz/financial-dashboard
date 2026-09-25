@@ -1,24 +1,8 @@
 import { appState } from '../core/state.js';
 import { PAYMENT_METHODS } from '../core/config.js';
-import { saveTransaction, updateTransaction, deleteTransaction as deleteTransactionApi } from '../api/endpoints.js';
+import { createTransaction, updateTransaction, removeTransaction } from '../services/transactionService.js';
 import { $, escapeHtml, openModal, closeModal, showLoading, hideLoading, showToast } from '../utils/dom.js';
 import { formatCurrency, formatDate, toInputDate } from '../utils/format.js';
-
-export function normalizeTransactions(items) {
-    return items.map((t, index) => ({
-        ...t,
-        id: t.id ?? t.ID ?? String(index),
-        date: t.date ?? t.Date ?? '',
-        type: t.type ?? t.Type ?? '',
-        category: t.category ?? t.Category ?? '',
-        subcategory: t.subcategory ?? t.Subcategory ?? '',
-        description: t.description ?? t.Description ?? '',
-        amount: Number(t.amount ?? t.Amount ?? 0) || 0,
-        paymentMethod: t.paymentMethod ?? t.PaymentMethod ?? '',
-        account: t.account ?? t.Account ?? '',
-        notes: t.notes ?? t.Notes ?? ''
-    }));
-}
 
 export function populateFilterDropdowns() {
     const select = $('categoryFilter');
@@ -167,7 +151,7 @@ export async function handleTransactionSubmit(e, reload) {
     try {
         const response = appState.editingTransactionId
             ? await updateTransaction(appState.apiUrl, appState.editingTransactionId, data)
-            : await saveTransaction(appState.apiUrl, data);
+            : await createTransaction(appState.apiUrl, data);
         if (!response.success) throw new Error(response.error || response.message || 'Operasi gagal');
         showToast(response.message || 'Transaksi berhasil disimpan', 'success');
         closeModal('transactionModal');
@@ -185,7 +169,7 @@ export async function deleteTransaction(id, reload = async () => {}) {
 
     showLoading('Menghapus transaksi...');
     try {
-        const result = await deleteTransactionApi(appState.apiUrl, id);
+        const result = await removeTransaction(appState.apiUrl, id);
         if (!result.success) throw new Error(result.error || result.message || 'Operasi gagal');
         showToast(result.message || 'Transaksi dihapus', 'success');
         await reload();
