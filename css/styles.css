@@ -1472,3 +1472,24 @@ button:disabled {
     padding: 0.55rem 0.8rem;
   }
 }
+
+
+/* ===== UX PATCH: CONNECTION AND CHART STATES ===== */
+.status-dot.error {
+  background: var(--danger-red);
+  animation: none;
+}
+
+.chart-empty-state {
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .chart-empty-state {
+    min-height: 220px;
+  }
+}
