@@ -1,11 +1,10 @@
-import { getDashboardData } from './api/endpoints.js';
 import { appState } from './core/state.js';
 import { DEFAULT_SETTINGS } from './core/config.js';
+import { loadDashboard } from './services/dashboardService.js';
 import { $, closeModal, openModal, showLoading, hideLoading, showToast } from './utils/dom.js';
 import { formatDate } from './utils/format.js';
 import { renderDashboard } from './components/dashboard.js';
 import {
-    normalizeTransactions,
     populateFilterDropdowns,
     populateTransactionDropdowns,
     populateTransactionCategories,
@@ -93,7 +92,11 @@ function saveSettings() {
     localStorage.setItem('dashboardSettings', JSON.stringify(appState.settings));
     setupAutoRefresh();
     showToast('Pengaturan berhasil disimpan', 'success');
-    if (apiUrl) loadDashboardData();
+    if (apiUrl) {
+        loadDashboardData();
+    } else {
+        updateLiveStatus('disconnected');
+    }
 }
 
 function setupAutoRefresh() {
@@ -104,32 +107,10 @@ function setupAutoRefresh() {
     }, seconds * 1000);
 }
 
-function buildApiFilters() {
-    const month = $('monthFilter')?.value || '';
-    appState.filters = {
-        month,
-        category: $('categoryFilter')?.value || '',
-        type: $('typeFilter')?.value || ''
-    };
-    const filters = {
-        dateFrom: null,
-        dateTo: null,
-        category: appState.filters.category,
-        type: appState.filters.type,
-        account: '',
-        paymentMethod: ''
-    };
-    if (month) {
-        const [year, m] = month.split('-').map(Number);
-        filters.dateFrom = new Date(year, m - 1, 1).toISOString();
-        filters.dateTo = new Date(year, m, 0, 23, 59, 59, 999).toISOString();
-    }
-    return filters;
-}
-
 async function loadDashboardData() {
     if (!appState.apiUrl) {
         hideLoading();
+        updateLiveStatus('disconnected');
         showToast('API URL belum dikonfigurasi. Buka Settings untuk mengaturnya.', 'warning');
         return;
     }
@@ -137,12 +118,12 @@ async function loadDashboardData() {
     showLoading('Memuat data dashboard...');
     updateLiveStatus('loading');
     try {
-        const data = await getDashboardData(appState.apiUrl, buildApiFilters());
-        appState.transactions = normalizeTransactions(data.transactions || []);
-        appState.accounts = data.accounts || [];
-        appState.categories = data.categories || [];
-        appState.budgets = data.budgets || [];
-        appState.lastUpdated = data.lastUpdated || new Date().toISOString();
+        const data = await loadDashboard(appState.apiUrl, appState.filters);
+        appState.transactions = data.transactions;
+        appState.accounts = data.accounts;
+        appState.categories = data.categories;
+        appState.budgets = data.budgets;
+        appState.lastUpdated = data.lastUpdated;
 
         populateFilterDropdowns();
         populateTransactionDropdowns();
@@ -160,6 +141,11 @@ async function loadDashboardData() {
 
 function applyFilters() {
     appState.currentPage = 1;
+    appState.filters = {
+        month: $('monthFilter')?.value || '',
+        category: $('categoryFilter')?.value || '',
+        type: $('typeFilter')?.value || ''
+    };
     loadDashboardData();
 }
 
@@ -198,6 +184,11 @@ function updateLiveStatus(state = 'live') {
 
     if (state === 'loading') {
         status.textContent = 'Connecting...';
+        return;
+    }
+
+    if (state === 'disconnected') {
+        status.textContent = 'Not connected';
         return;
     }
 
