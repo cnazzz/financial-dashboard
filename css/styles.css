@@ -1359,3 +1359,116 @@ form {
 .gap-1 { gap: var(--spacing-sm); }
 .gap-2 { gap: var(--spacing-md); }
 .gap-3 { gap: var(--spacing-lg); }
+
+/* ===== UX PATCH: MOBILE, STATES, TABLE ACTIONS ===== */
+.mobile-menu-button {
+  display: none;
+}
+
+.btn:disabled,
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.transaction-table .btn {
+  width: auto;
+  white-space: nowrap;
+}
+
+.transaction-table td:last-child {
+  white-space: nowrap;
+}
+
+.transaction-table .type-badge {
+  white-space: nowrap;
+}
+
+.empty-state {
+  padding: var(--spacing-xl);
+  color: var(--text-secondary);
+  text-align: center;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-xl);
+  background: rgba(22, 27, 34, 0.35);
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-button {
+    display: flex !important;
+  }
+
+  .header {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .header-left {
+    min-width: 0;
+  }
+
+  .header-left h1 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-right {
+    width: auto;
+    margin-left: auto;
+  }
+
+  .status-indicator {
+    display: none;
+  }
+
+  .section-header {
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+  }
+
+  .section-header .btn {
+    width: auto;
+  }
+
+  .charts-grid {
+    min-width: 0;
+  }
+
+  .chart-container {
+    min-width: 0;
+  }
+
+  .transaction-table-container {
+    border-radius: var(--radius-lg);
+  }
+
+  .transaction-table {
+    min-width: 760px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-area {
+    padding: 1rem;
+  }
+
+  .filters-section {
+    padding: 1rem;
+  }
+
+  .section-header .btn {
+    width: 100%;
+  }
+
+  .pagination {
+    gap: 0.5rem;
+  }
+
+  .pagination button {
+    padding: 0.55rem 0.8rem;
+  }
+}
