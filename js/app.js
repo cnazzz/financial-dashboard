@@ -135,6 +135,7 @@ async function loadDashboardData() {
     }
 
     showLoading('Memuat data dashboard...');
+    updateLiveStatus('loading');
     try {
         const data = await getDashboardData(appState.apiUrl, buildApiFilters());
         appState.transactions = normalizeTransactions(data.transactions || []);
@@ -150,6 +151,7 @@ async function loadDashboardData() {
         updateLiveStatus();
     } catch (error) {
         console.error('Dashboard load error:', error);
+        updateLiveStatus('error');
         showToast('Gagal memuat data: ' + error.message, 'error');
     } finally {
         hideLoading();
@@ -181,11 +183,26 @@ function closeTransactionForm() {
     appState.editingTransactionId = null;
 }
 
-function updateLiveStatus() {
+function updateLiveStatus(state = 'live') {
     const dot = document.querySelector('.status-dot');
-    if (dot) dot.classList.add('live');
     const status = document.querySelector('.status-indicator span:last-child');
-    if (status) status.textContent = appState.lastUpdated
+    if (!dot || !status) return;
+
+    dot.classList.remove('live', 'error');
+
+    if (state === 'error') {
+        dot.classList.add('error');
+        status.textContent = 'Connection error';
+        return;
+    }
+
+    if (state === 'loading') {
+        status.textContent = 'Connecting...';
+        return;
+    }
+
+    dot.classList.add('live');
+    status.textContent = appState.lastUpdated
         ? 'Live Data • ' + formatDate(appState.lastUpdated, 'HH:mm:ss')
         : 'Live Data';
 }
