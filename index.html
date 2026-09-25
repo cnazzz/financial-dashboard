@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,10 +59,10 @@
                 </div>
                 <div class="header-right">
                     <div class="status-indicator">
-                        <span class="status-dot live"></span>
-                        <span>Live Data</span>
+                        <span class="status-dot"></span>
+                        <span>Not connected</span>
                     </div>
-                    <button class="btn-icon" id="menuToggleMobile" style="display: none;">☰</button>
+                    <button class="btn-icon mobile-menu-button" id="menuToggleMobile" aria-label="Buka menu">☰</button>
                 </div>
             </div>
 
@@ -169,7 +169,7 @@
                 <section class="section" id="budget-section">
                     <div class="section-header">
                         <h2>Budget</h2>
-                        <button class="btn btn-primary" id="addBudgetBtn">
+                        <button class="btn btn-secondary" id="addBudgetBtn" disabled title="Fitur budget belum terhubung ke backend">
                             ➕ Add Budget
                         </button>
                     </div>
@@ -211,7 +211,7 @@
                 <section class="section" id="accounts-section">
                     <div class="section-header">
                         <h2>Accounts</h2>
-                        <button class="btn btn-primary" id="addAccountBtn">
+                        <button class="btn btn-secondary" id="addAccountBtn" disabled title="Fitur akun belum terhubung ke backend">
                             ➕ Add Account
                         </button>
                     </div>
