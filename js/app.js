@@ -1,4 +1,5 @@
 import { getDashboardData, saveTransaction, updateTransaction, deleteTransaction } from './api/endpoints.js';
+import { calculateKPI, calculateAccountBalances, aggregateByCategory, calculateBudgetUsage } from './calculations/finance.js';
 
 const DEFAULT_SETTINGS = {
     currency: 'IDR',
@@ -249,17 +250,8 @@ function renderDashboard() {
     renderAccountsSection();
 }
 
-function calculateKPI() {
-    let income = 0, expense = 0;
-    appState.transactions.forEach(t => {
-        if (t.type === 'Income') income += t.amount;
-        if (t.type === 'Expense') expense += t.amount;
-    });
-    return { totalIncome: income, totalExpense: expense, netCashflow: income - expense, transactionCount: appState.transactions.length };
-}
-
 function renderKpis() {
-    const k = calculateKPI();
+    const k = calculateKPI(appState.transactions);
     const container = $('kpiGrid');
     if (!container) return;
     const cards = [
@@ -291,24 +283,10 @@ function renderInsights() {
     ].join('');
 }
 
-function calculateAccountBalances() {
-    const balances = {};
-    appState.accounts.forEach(a => {
-        const name = a.name ?? a.account;
-        balances[name] = Number(a.initialBalance ?? a.balance ?? 0) || 0;
-    });
-    appState.transactions.forEach(t => {
-        if (!t.account) return;
-        if (t.type === 'Income') balances[t.account] = (balances[t.account] || 0) + t.amount;
-        if (t.type === 'Expense') balances[t.account] = (balances[t.account] || 0) - t.amount;
-    });
-    return Object.entries(balances).map(([account, balance]) => ({ account, balance })).sort((a,b) => b.balance - a.balance);
-}
-
 function renderAccountBalances() {
     const el = $('accountBalances');
     if (!el) return;
-    const balances = calculateAccountBalances();
+    const balances = calculateAccountBalances(appState.accounts, appState.transactions);
     el.innerHTML = balances.length ? balances.map(b =>
         '<div class="account-balance-card"><h4>' + escapeHtml(b.account) + '</h4><div class="amount">' + formatCurrency(b.balance) + '</div></div>'
     ).join('') : '<div class="empty-state">Belum ada data akun.</div>';
@@ -382,28 +360,22 @@ function renderBudgetSection() {
     el.innerHTML = appState.budgets.length ? appState.budgets.map(b => {
         const budget = Number(b.budget ?? b.amount ?? 0) || 0;
         const actual = Number(b.actual ?? b.spent ?? 0) || 0;
-        const pct = budget ? actual / budget * 100 : 0;
+        const { percentage, progressPercentage } = calculateBudgetUsage(budget, actual);
         return '<div class="budget-card"><h4>' + escapeHtml(b.category ?? '') + '</h4><div class="budget-info"><span>Budget:</span><strong>' +
             formatCurrency(budget) + '</strong></div><div class="budget-info"><span>Terpakai:</span><strong>' + formatCurrency(actual) +
             '</strong></div><div class="budget-info"><span>Sisa:</span><strong>' + formatCurrency(budget - actual) +
-            '</strong></div><div class="budget-progress"><div class="budget-progress-bar" style="width:' + Math.min(100, Math.max(0, pct)) + '%"></div></div><div class="budget-status">' +
-            pct.toFixed(0) + '% Terpakai</div></div>';
+            '</strong></div><div class="budget-progress"><div class="budget-progress-bar" style="width:' + progressPercentage + '%"></div></div><div class="budget-status">' +
+            percentage.toFixed(0) + '% Terpakai</div></div>';
     }).join('') : '<div class="empty-state">Belum ada data budget.</div>';
 }
 
 function renderAnalysisSection() {
-    const expenses = aggregateByCategory('Expense').slice(0, 5);
-    const incomes = aggregateByCategory('Income').slice(0, 5);
+    const expenses = aggregateByCategory(appState.transactions, 'Expense').slice(0, 5);
+    const incomes = aggregateByCategory(appState.transactions, 'Income').slice(0, 5);
     renderList($('topExpensesList'), expenses);
     renderList($('topIncomeList'), incomes);
     const k = calculateKPI();
     renderList($('savingsList'), [{ category: 'Net Cashflow', amount: k.netCashflow }]);
-}
-
-function aggregateByCategory(type) {
-    const data = {};
-    appState.transactions.filter(t => t.type === type).forEach(t => data[t.category] = (data[t.category] || 0) + t.amount);
-    return Object.entries(data).map(([category, amount]) => ({ category, amount })).sort((a,b) => b.amount - a.amount);
 }
 
 function renderList(el, items) {
