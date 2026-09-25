@@ -6,9 +6,16 @@
   "scripts": {
     "dev": "npx --yes http-server@14.1.1 . -c-1",
     "start": "npx --yes http-server@14.1.1 .",
-    "build": "node -e \"console.log('Static site: no build step required')\""
+    "build": "node -e \"console.log('Static site: no build step required')\"",
+    "test": "node --test"
   },
-  "keywords": ["finance", "dashboard", "budget", "tracking"],
+  "keywords": [
+    "finance",
+    "dashboard",
+    "budget",
+    "tracking"
+  ],
   "author": "cnazzz",
-  "license": "MIT"
+  "license": "MIT",
+  "type": "module"
 }
