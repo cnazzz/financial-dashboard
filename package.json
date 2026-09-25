@@ -3,14 +3,10 @@
   "version": "1.1.0",
   "description": "Personal Finance Dashboard with Google Apps Script API",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev": "http-server . -c-1",
-    "start": "http-server .",
+    "dev": "npx --yes http-server@14.1.1 . -c-1",
+    "start": "npx --yes http-server@14.1.1 .",
     "build": "node -e \"console.log('Static site: no build step required')\""
-  },
-  "devDependencies": {
-    "http-server": "^14.1.1"
   },
   "keywords": ["finance", "dashboard", "budget", "tracking"],
   "author": "cnazzz",
